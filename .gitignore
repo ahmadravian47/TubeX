@@ -26,4 +26,4 @@ Thumbs.db
 .idea/
 
 # Ignore credentials file
-backend/credentials.json
+backend\credentials.json
