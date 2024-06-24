@@ -204,7 +204,6 @@ const cors = require("cors");
 const multer = require("multer");
 const open = require("open");
 const fs = require('fs');
-const credential = require('./credentials.json');
 
 require('dotenv').config();
 
