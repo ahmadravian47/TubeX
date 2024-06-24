@@ -209,14 +209,9 @@ require('dotenv').config();
 
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
-const projectId = process.env.PROJECT_ID;
-const authUri = process.env.AUTH_URI;
-const tokenUri = process.env.TOKEN_URI;
-const certUrl = process.env.AUTH_PROVIDER_X509_CERT_URL;
 const redirectUris = process.env.REDIRECT_URIS.split(',');
-const javascriptOrigins = process.env.JAVASCRIPT_ORIGINS.split(',');
+const PORT = process.env.PORT || 3000;
 
-const PORT = 3000;
 
 const app = express();
 app.use(express.json());
