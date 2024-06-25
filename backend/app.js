@@ -195,35 +195,24 @@
 // });
 
 
-
-
 const express = require("express");
 const { google } = require("googleapis");
 const { v4: uuid } = require("uuid");
 const cors = require("cors");
 const multer = require("multer");
 const open = require("open");
-const fs = require('fs');
+const { Readable } = require("stream");  // Import the Readable class from the stream module
+
 
 require('dotenv').config();
 
-const clientId = process.env.CLIENT_ID;
-const clientSecret = process.env.CLIENT_SECRET;
-const redirectUris = process.env.REDIRECT_URIS.split(',');
-const PORT = process.env.PORT || 3000;
-
+const PORT = 3000;
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-const storage = multer.diskStorage({
-    destination: './',
-    filename (req, file, cb) {
-        const newFileName = `${uuid()}-${file.originalname}`;
-        cb(null, newFileName);
-    }
-});
+const storage = multer.memoryStorage();
 
 const uploadVideoFile = multer({
     storage: storage
@@ -231,9 +220,9 @@ const uploadVideoFile = multer({
 
 const OAuth2 = google.auth.OAuth2;
 const oauth2Client = new OAuth2(
-    clientId,
-    clientSecret,
-    redirectUris[0]
+    process.env.CLIENT_ID,
+    process.env.CLIENT_SECRET,
+    process.env.REDIRECT_URIS
 );
 
 const youtube = google.youtube({
@@ -241,19 +230,26 @@ const youtube = google.youtube({
     auth: oauth2Client
 });
 
+// In-memory storage for video files
+const videoBufferStore = {};
+
 app.post('/upload', uploadVideoFile, (req, res) => {
     if (req.file) {
-        const filename = req.file.filename;
         const { title, description } = req.body;
+        const fileBuffer = req.file.buffer;
+        const fileId = uuid();
+
+        // Store the buffer in memory
+        videoBufferStore[fileId] = {
+            buffer: fileBuffer,
+            title,
+            description
+        };
 
         const authUrl = oauth2Client.generateAuthUrl({
             access_type: 'offline',
             scope: 'https://www.googleapis.com/auth/youtube.upload',
-            state: JSON.stringify({
-                filename,
-                title,
-                description
-            })
+            state: JSON.stringify({ fileId })
         });
 
         open(authUrl).then(() => {
@@ -269,7 +265,14 @@ app.post('/upload', uploadVideoFile, (req, res) => {
 
 app.get('/oauth2callback', (req, res) => {
     res.redirect("https://yuwn8.csb.app/success");
-    const { filename, title, description } = JSON.parse(req.query.state);
+    const { fileId } = JSON.parse(req.query.state);
+    const videoData = videoBufferStore[fileId];
+
+    if (!videoData) {
+        return res.status(400).send("Invalid file ID.");
+    }
+
+    const { buffer, title, description } = videoData;
 
     oauth2Client.getToken(req.query.code, (err, tokens) => {
         if (err) {
@@ -290,7 +293,7 @@ app.get('/oauth2callback', (req, res) => {
             },
             part: 'snippet,status',
             media: {
-                body: fs.createReadStream(filename)
+                body: Readable.from(buffer)  // Use a readable stream from the buffer
             }
         }, (err, data) => {
             if (err) {
@@ -306,3 +309,4 @@ app.get('/oauth2callback', (req, res) => {
 app.listen(PORT, () => {
     console.log(`App is listening on Port ${PORT}`);
 });
+
