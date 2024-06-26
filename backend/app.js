@@ -444,7 +444,7 @@ const { v4: uuid } = require("uuid");
 const cors = require("cors");
 const multer = require("multer");
 const { Readable } = require("stream");
-require('dotenv').config();
+// require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
