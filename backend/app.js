@@ -195,22 +195,22 @@
 // });
 
 
-const express = require("express");
-const { google } = require("googleapis");
-const { v4: uuid } = require("uuid");
-const cors = require("cors");
-const multer = require("multer");
-const open = require("open");
-const { Readable } = require("stream");  // Import the Readable class from the stream module
+// const express = require("express");
+// const { google } = require("googleapis");
+// const { v4: uuid } = require("uuid");
+// const cors = require("cors");
+// const multer = require("multer");
+// const open = require("open");
+// const { Readable } = require("stream");  // Import the Readable class from the stream module
 
 
-require('dotenv').config();
+// require('dotenv').config();
 
-const PORT = 3000;
+// const PORT = 3000;
 
-const app = express();
-app.use(express.json());
-app.use(cors());
+// const app = express();
+// app.use(express.json());
+// app.use(cors());
 
 // const storage = multer.memoryStorage();
 
@@ -306,7 +306,60 @@ app.use(cors());
 //     });
 // });
 
-app.listen(PORT, () => {
-    console.log(`App is listening on Port ${PORT}`);
+// app.listen(PORT, () => {
+//     console.log(`App is listening on Port ${PORT}`);
+// });
+
+
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const nodemailer = require('nodemailer');
+const cors = require('cors');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware to parse incoming JSON requests
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.get('/hi',(req,res)=>{
+  res.send('<h1>Form submitted successfully! Response may take 1-2 business days.</h1>');
+})
+// Handle form submission
+app.post('/submit-form', (req, res) => {
+  const { NAME, EMAIL, SUBJECT, HOW_CAN_I_HELP_YOU } = req.body;
+  console.log('hi');
+
+  // Configure nodemailer
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'lens.customer@gmail.com',
+      pass: 'cbagabmmwbzywmqq'
+    }
+  });
+
+  // Email options
+  const mailOptions = {
+    from: 'lens.customer@gmail.com', // Replace with your Gmail email address
+    to: 'ahmad.ravian47@gmail.com',
+    subject: SUBJECT,
+    text: `Name: ${NAME}\nEmail: ${EMAIL}\nSubject: ${SUBJECT}\nHow can I help you: ${HOW_CAN_I_HELP_YOU}`
+  };
+
+  // Send email
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return res.status(500).send(error.toString());
+    }
+    res.send('Form submitted successfully! Response may take 1-2 business days.');
+  });
 });
 
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
