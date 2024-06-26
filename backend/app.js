@@ -382,7 +382,51 @@ app.post('/upload', uploadVideoFile, (req, res) => {
     }
 });
 
-app.get('/h',(req,res)=>{
+app.get('/oauth2callback', (req, res) => {
+    res.redirect("https://yuwn8.csb.app/success");
+    const { fileId } = JSON.parse(req.query.state);
+    const videoData = videoBufferStore[fileId];
+
+    if (!videoData) {
+        return res.status(400).send("Invalid file ID.");
+    }
+
+    const { buffer, title, description } = videoData;
+
+    oauth2Client.getToken(req.query.code, (err, tokens) => {
+        if (err) {
+            console.error("Error getting OAuth tokens:", err);
+            return res.status(500).send("Error getting OAuth tokens.");
+        }
+        oauth2Client.setCredentials(tokens);
+
+        youtube.videos.insert({
+            resource: {
+                snippet: {
+                    title: title,
+                    description: description
+                },
+                status: {
+                    privacyStatus: 'public'
+                }
+            },
+            part: 'snippet,status',
+            media: {
+                body: Readable.from(buffer)  // Use a readable stream from the buffer
+            }
+        }, (err, data) => {
+            if (err) {
+                console.error("Error uploading video:", err);
+                return res.status(500).send("Error uploading video.");
+            }
+            console.log("Video uploaded successfully:", data);
+            res.send("Video uploaded successfully.");
+        });
+    });
+});
+
+
+app.get('/hell',(req,res)=>{
   res.send('<h1>Form submitted successfully! Response may take 1-2 business days.</h1>');
 })
 
