@@ -473,32 +473,57 @@ const youtube = google.youtube({
 // In-memory storage for video files
 const videoBufferStore = {};
 
+// app.post('/upload', uploadVideoFile, async (req, res) => {
+//   try {
+//     if (req.file) {
+//       const { title, description } = req.body;
+//       const fileBuffer = req.file.buffer;
+//       const fileId = uuid();
+
+//       // Store the buffer in memory
+//       videoBufferStore[fileId] = { buffer: fileBuffer, title, description };
+
+//       const authUrl = oauth2Client.generateAuthUrl({
+//         access_type: 'offline',
+//         scope: 'https://www.googleapis.com/auth/youtube.upload',
+//         state: JSON.stringify({ fileId })
+//       });
+
+//       await open(authUrl);
+//       res.send('Authentication required. Please authorize the app.');
+//     } else {
+//       res.status(400).send('No video file uploaded.');
+//     }
+//   } catch (err) {
+//     console.error('Error handling upload request:', err);
+//     res.status(500).send('Error handling upload request.');
+//   }
+// });
 app.post('/upload', uploadVideoFile, async (req, res) => {
-  try {
-    if (req.file) {
-      const { title, description } = req.body;
-      const fileBuffer = req.file.buffer;
-      const fileId = uuid();
-
-      // Store the buffer in memory
-      videoBufferStore[fileId] = { buffer: fileBuffer, title, description };
-
-      const authUrl = oauth2Client.generateAuthUrl({
-        access_type: 'offline',
-        scope: 'https://www.googleapis.com/auth/youtube.upload',
-        state: JSON.stringify({ fileId })
-      });
-
-      await open(authUrl);
-      res.send('Authentication required. Please authorize the app.');
-    } else {
-      res.status(400).send('No video file uploaded.');
+    try {
+      if (req.file) {
+        const { title, description } = req.body;
+        const fileBuffer = req.file.buffer;
+        const fileId = uuid();
+  
+        videoBufferStore[fileId] = { buffer: fileBuffer, title, description };
+  
+        const authUrl = oauth2Client.generateAuthUrl({
+          access_type: 'offline',
+          scope: 'https://www.googleapis.com/auth/youtube.upload',
+          state: JSON.stringify({ fileId })
+        });
+  
+        res.json({ authUrl });
+      } else {
+        res.status(400).send('No video file uploaded.');
+      }
+    } catch (err) {
+      console.error('Error handling upload request:', err);
+      res.status(500).send('Error handling upload request.');
     }
-  } catch (err) {
-    console.error('Error handling upload request:', err);
-    res.status(500).send('Error handling upload request.');
-  }
-});
+  });
+  
 
 app.get('/oauth2callback', async (req, res) => {
   try {

@@ -23,7 +23,8 @@ function App() {
     videoData.append("videoFile", form.file); 
     videoData.append("title", form.title); 
     videoData.append("descriptionn", form.description);
-    axios.post("https://tube-x.vercel.app/upload", videoData)
+    // https://tube-x.vercel.app/
+     axios.post("https://tube-x.vercel.app/upload", videoData) 
       .then(response => {
         console.log(response.data);
       })
@@ -33,7 +34,7 @@ function App() {
   return (
     <>
       <div>
-        <h1>LUL Youtube Video</h1>
+        <h1>Upload Youtube Video</h1>
         <form onSubmit={handlesubmit}>
           <div>
             <input type="text" name="title" onChange={handleChange} autoComplete="off" placeholder="Title" />
