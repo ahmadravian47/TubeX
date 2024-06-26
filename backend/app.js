@@ -339,16 +339,15 @@ const uploadVideoFile = multer({
 
 const OAuth2 = google.auth.OAuth2;
 const oauth2Client = new OAuth2(
-    credential.web.client_id,
-    credential.web.client_secret,
-    credential.web.redirect_uris[0]
+    process.env.CLIENT_ID,
+    process.env.CLIENT_SECRET,
+    process.env.REDIRECT_URIS
 );
 
 const youtube = google.youtube({
     version: 'v3',
     auth: oauth2Client
 });
-
 
 app.get('/hi',(req,res)=>{
   res.send('<h1>Form submitted successfully! Response may take 1-2 business days.</h1>');
