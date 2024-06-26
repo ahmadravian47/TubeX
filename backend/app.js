@@ -349,7 +349,40 @@ const youtube = google.youtube({
     auth: oauth2Client
 });
 
-app.get('/hi',(req,res)=>{
+// In-memory storage for video files
+const videoBufferStore = {};
+
+app.post('/upload', uploadVideoFile, (req, res) => {
+    if (req.file) {
+        const { title, description } = req.body;
+        const fileBuffer = req.file.buffer;
+        const fileId = uuid();
+
+        // Store the buffer in memory
+        videoBufferStore[fileId] = {
+            buffer: fileBuffer,
+            title,
+            description
+        };
+
+        const authUrl = oauth2Client.generateAuthUrl({
+            access_type: 'offline',
+            scope: 'https://www.googleapis.com/auth/youtube.upload',
+            state: JSON.stringify({ fileId })
+        });
+
+        open(authUrl).then(() => {
+            res.send("Authentication required. Please authorize the app.");
+        }).catch(err => {
+            console.error("Error opening the auth URL:", err);
+            res.status(500).send("Error opening the auth URL.");
+        });
+    } else {
+        res.status(400).send("No video file uploaded.");
+    }
+});
+
+app.get('/h',(req,res)=>{
   res.send('<h1>Form submitted successfully! Response may take 1-2 business days.</h1>');
 })
 
