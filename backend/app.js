@@ -527,7 +527,6 @@ app.post('/upload', uploadVideoFile, async (req, res) => {
 
 app.get('/oauth2callback', async (req, res) => {
   try {
-    res.redirect('http://localhost:5173/success');
     const { fileId } = JSON.parse(req.query.state);
     const videoData = videoBufferStore[fileId];
 
@@ -549,6 +548,7 @@ app.get('/oauth2callback', async (req, res) => {
       media: { body: Readable.from(buffer) }
     });
 
+    // res.redirect('http://localhost:5173/success');
     console.log('Video uploaded successfully:', response.data);
     res.send('Video uploaded successfully.');
   } catch (err) {
