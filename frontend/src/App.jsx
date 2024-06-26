@@ -17,18 +17,36 @@ function App() {
   }
 
 
+  // function handlesubmit(event) {
+  //   event.preventDefault();
+  //   const videoData = new FormData();
+  //   videoData.append("videoFile", form.file); 
+  //   videoData.append("title", form.title); 
+  //   videoData.append("descriptionn", form.description);
+  //   // https://tube-x.vercel.app/
+  //    axios.post("https://tube-x.vercel.app/upload", videoData) 
+  //     .then(response => {
+  //       console.log(response.data);
+  //     })
+  
+  // }
+
   function handlesubmit(event) {
     event.preventDefault();
     const videoData = new FormData();
-    videoData.append("videoFile", form.file); 
-    videoData.append("title", form.title); 
-    videoData.append("descriptionn", form.description);
-    // https://tube-x.vercel.app/
-     axios.post("https://tube-x.vercel.app/upload", videoData) 
+    videoData.append('videoFile', form.file);
+    videoData.append('title', form.title);
+    videoData.append('description', form.description);
+
+    axios.post('https://tube-x.vercel.app/upload', videoData)
       .then(response => {
-        console.log(response.data);
+        if (response.data.authUrl) {
+          window.location.href = response.data.authUrl;
+        }
       })
-  
+      .catch(error => {
+        console.error('Error uploading video:', error);
+      });
   }
 
   return (
