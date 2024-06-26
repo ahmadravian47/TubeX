@@ -557,7 +557,7 @@ app.get('/oauth2callback', async (req, res) => {
   }
 });
 
-app.get('/hell', (req, res) => {
+app.get('/helll', (req, res) => {
   res.send('<h1>Form submitted successfully! Response may take 1-2 business days.</h1>');
 });
 
