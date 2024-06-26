@@ -527,7 +527,7 @@ app.post('/upload', uploadVideoFile, async (req, res) => {
 
 app.get('/oauth2callback', async (req, res) => {
   try {
-    res.redirect('https://yuwn8.csb.app/success');
+    res.redirect('http://localhost:5173/success');
     const { fileId } = JSON.parse(req.query.state);
     const videoData = videoBufferStore[fileId];
 
