@@ -337,39 +337,35 @@ const uploadVideoFile = multer({
     storage: storage
 }).single("videoFile");
 
+const OAuth2 = google.auth.OAuth2;
+const oauth2Client = new OAuth2(
+    credential.web.client_id,
+    credential.web.client_secret,
+    credential.web.redirect_uris[0]
+);
+
+const youtube = google.youtube({
+    version: 'v3',
+    auth: oauth2Client
+});
+
+
 app.get('/hi',(req,res)=>{
   res.send('<h1>Form submitted successfully! Response may take 1-2 business days.</h1>');
 })
-// Handle form submission
-app.post('/submit-form', (req, res) => {
-  const { NAME, EMAIL, SUBJECT, HOW_CAN_I_HELP_YOU } = req.body;
-  console.log('hi');
 
-  // Configure nodemailer
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'lens.customer@gmail.com',
-      pass: 'cbagabmmwbzywmqq'
-    }
-  });
 
-  // Email options
-  const mailOptions = {
-    from: 'lens.customer@gmail.com', // Replace with your Gmail email address
-    to: 'ahmad.ravian47@gmail.com',
-    subject: SUBJECT,
-    text: `Name: ${NAME}\nEmail: ${EMAIL}\nSubject: ${SUBJECT}\nHow can I help you: ${HOW_CAN_I_HELP_YOU}`
-  };
 
-  // Send email
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      return res.status(500).send(error.toString());
-    }
-    res.send('Form submitted successfully! Response may take 1-2 business days.');
-  });
-});
+
+
+
+
+
+
+
+
+
+
 
 // Start the server
 app.listen(PORT, () => {
