@@ -312,19 +312,139 @@
 
 
 
+// const express = require('express');
+// const bodyParser = require('body-parser');
+// const nodemailer = require('nodemailer');
+// // const express = require("express");
+// const { google } = require("googleapis");
+// const { v4: uuid } = require("uuid");
+// // const cors = require("cors");
+// const multer = require("multer");
+// const open = require("open");
+// const { Readable } = require("stream");  // Import the Readable class from the stream module
+// const cors = require('cors');
+
+// // require('dotenv').config();
+
+// const app = express();
+// const PORT = process.env.PORT || 3000;
+
+// // Middleware to parse incoming JSON requests
+// app.use(express.json());
+// app.use(cors());
+
+// const storage = multer.memoryStorage();
+
+// const uploadVideoFile = multer({
+//     storage: storage
+// }).single("videoFile");
+
+// const OAuth2 = google.auth.OAuth2;
+// const oauth2Client = new OAuth2(
+//     process.env.CLIENT_ID,
+//     process.env.CLIENT_SECRET,
+//     process.env.REDIRECT_URIS
+// );
+
+// const youtube = google.youtube({
+//     version: 'v3',
+//     auth: oauth2Client
+// });
+
+// // In-memory storage for video files
+// const videoBufferStore = {};
+
+// app.post('/upload', uploadVideoFile, (req, res) => {
+//     if (req.file) {
+//         const { title, description } = req.body;
+//         const fileBuffer = req.file.buffer;
+//         const fileId = uuid();
+
+//         // Store the buffer in memory
+//         videoBufferStore[fileId] = {
+//             buffer: fileBuffer,
+//             title,
+//             description
+//         };
+
+//         const authUrl = oauth2Client.generateAuthUrl({
+//             access_type: 'offline',
+//             scope: 'https://www.googleapis.com/auth/youtube.upload',
+//             state: JSON.stringify({ fileId })
+//         });
+
+//         open(authUrl).then(() => {
+//             res.send("Authentication required. Please authorize the app.");
+//         }).catch(err => {
+//             console.error("Error opening the auth URL:", err);
+//             res.status(500).send("Error opening the auth URL.");
+//         });
+//     } else {
+//         res.status(400).send("No video file uploaded.");
+//     }
+// });
+
+// app.get('/oauth2callback', (req, res) => {
+//     res.redirect("https://yuwn8.csb.app/success");
+//     const { fileId } = JSON.parse(req.query.state);
+//     const videoData = videoBufferStore[fileId];
+
+//     if (!videoData) {
+//         return res.status(400).send("Invalid file ID.");
+//     }
+
+//     const { buffer, title, description } = videoData;
+
+//     oauth2Client.getToken(req.query.code, (err, tokens) => {
+//         if (err) {
+//             console.error("Error getting OAuth tokens:", err);
+//             return res.status(500).send("Error getting OAuth tokens.");
+//         }
+//         oauth2Client.setCredentials(tokens);
+
+//         youtube.videos.insert({
+//             resource: {
+//                 snippet: {
+//                     title: title,
+//                     description: description
+//                 },
+//                 status: {
+//                     privacyStatus: 'public'
+//                 }
+//             },
+//             part: 'snippet,status',
+//             media: {
+//                 body: Readable.from(buffer)  // Use a readable stream from the buffer
+//             }
+//         }, (err, data) => {
+//             if (err) {
+//                 console.error("Error uploading video:", err);
+//                 return res.status(500).send("Error uploading video.");
+//             }
+//             console.log("Video uploaded successfully:", data);
+//             res.send("Video uploaded successfully.");
+//         });
+//     });
+// });
+
+
+// app.get('/hell',(req,res)=>{
+//   res.send('<h1>Form submitted successfully! Response may take 1-2 business days.</h1>');
+// })
+// // Start the server
+// app.listen(PORT, () => {
+//   console.log(`Server is running on http://localhost:${PORT}`);
+// });
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
-// const express = require("express");
 const { google } = require("googleapis");
 const { v4: uuid } = require("uuid");
-// const cors = require("cors");
+const cors = require("cors");
 const multer = require("multer");
-const open = require("open");
-const { Readable } = require("stream");  // Import the Readable class from the stream module
-const cors = require('cors');
-
-// require('dotenv').config();
+const { Readable } = require("stream");
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -334,10 +454,7 @@ app.use(express.json());
 app.use(cors());
 
 const storage = multer.memoryStorage();
-
-const uploadVideoFile = multer({
-    storage: storage
-}).single("videoFile");
+const uploadVideoFile = multer({ storage: storage }).single("videoFile");
 
 const OAuth2 = google.auth.OAuth2;
 const oauth2Client = new OAuth2(
@@ -373,19 +490,13 @@ app.post('/upload', uploadVideoFile, (req, res) => {
             state: JSON.stringify({ fileId })
         });
 
-        open(authUrl).then(() => {
-            res.send("Authentication required. Please authorize the app.");
-        }).catch(err => {
-            console.error("Error opening the auth URL:", err);
-            res.status(500).send("Error opening the auth URL.");
-        });
+        res.json({ authUrl, message: "Please navigate to the URL to authorize the app." });
     } else {
         res.status(400).send("No video file uploaded.");
     }
 });
 
 app.get('/oauth2callback', (req, res) => {
-    res.redirect("https://yuwn8.csb.app/success");
     const { fileId } = JSON.parse(req.query.state);
     const videoData = videoBufferStore[fileId];
 
@@ -425,27 +536,15 @@ app.get('/oauth2callback', (req, res) => {
             res.send("Video uploaded successfully.");
         });
     });
+
+    res.redirect("https://tube-x.vercel.app/hell");
 });
 
-
-app.get('/hell',(req,res)=>{
-  res.send('<h1>Form submitted successfully! Response may take 1-2 business days.</h1>');
-})
-
-
-
-
-
-
-
-
-
-
-
-
-
+app.get('/hell', (req, res) => {
+    res.send('<h1>Form submitted successfully! Response may take 1-2 business days.</h1>');
+});
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server is running on http://localhost:${PORT}`);
 });

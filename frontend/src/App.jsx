@@ -23,7 +23,7 @@ function App() {
     videoData.append("videoFile", form.file); 
     videoData.append("title", form.title); 
     videoData.append("descriptionn", form.description);
-    axios.post("http://localhost:3000/upload", videoData)
+    axios.post("https://tube-x.vercel.app/upload", videoData)
       .then(response => {
         console.log(response.data);
       })
