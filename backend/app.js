@@ -324,7 +324,7 @@ const open = require("open");
 const { Readable } = require("stream");  // Import the Readable class from the stream module
 const cors = require('cors');
 
-require('dotenv').config();
+// require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
