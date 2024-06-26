@@ -33,7 +33,7 @@ function App() {
   return (
     <>
       <div>
-        <h1>Upload Youtube Video</h1>
+        <h1>LUL Youtube Video</h1>
         <form onSubmit={handlesubmit}>
           <div>
             <input type="text" name="title" onChange={handleChange} autoComplete="off" placeholder="Title" />
