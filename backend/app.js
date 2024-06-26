@@ -328,9 +328,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware to parse incoming JSON requests
+app.use(express.json());
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+
+const storage = multer.memoryStorage();
+
+const uploadVideoFile = multer({
+    storage: storage
+}).single("videoFile");
 
 app.get('/hi',(req,res)=>{
   res.send('<h1>Form submitted successfully! Response may take 1-2 business days.</h1>');
